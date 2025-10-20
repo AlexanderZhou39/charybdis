@@ -28,7 +28,8 @@
 
 // Limits the frequency that the sensor is polled for motion.
 #define POINTING_DEVICE_TASK_THROTTLE_MS 1
-
+// Invert Y axis on scroll reports.
+#define CHARYBDIS_DRAGSCROLL_REVERSE_Y
 // Invert X axis on mouse reports.
 #define POINTING_DEVICE_INVERT_X
 /* RGB matrix support. */

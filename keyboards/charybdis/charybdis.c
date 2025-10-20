@@ -27,7 +27,7 @@
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifndef CHARYBDIS_MINIMUM_DEFAULT_DPI
-#        define CHARYBDIS_MINIMUM_DEFAULT_DPI 400
+#        define CHARYBDIS_MINIMUM_DEFAULT_DPI 650
 #    endif // CHARYBDIS_MINIMUM_DEFAULT_DPI
 
 #    ifndef CHARYBDIS_DEFAULT_DPI_CONFIG_STEP
@@ -35,7 +35,7 @@
 #    endif // CHARYBDIS_DEFAULT_DPI_CONFIG_STEP
 
 #    ifndef CHARYBDIS_MINIMUM_SNIPING_DPI
-#        define CHARYBDIS_MINIMUM_SNIPING_DPI 200
+#        define CHARYBDIS_MINIMUM_SNIPING_DPI 100
 #    endif // CHARYBDIS_MINIMUM_SNIPER_MODE_DPI
 
 #    ifndef CHARYBDIS_SNIPING_DPI_CONFIG_STEP
@@ -254,10 +254,10 @@ static void debug_charybdis_config_to_console(charybdis_config_t* config) {
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
-    if (!process_record_user(keycode, record)) {
-        debug_charybdis_config_to_console(&g_charybdis_config);
-        return false;
-    }
+    // if (!process_record_user(keycode, record)) {
+    //     debug_charybdis_config_to_console(&g_charybdis_config);
+    //     return false;
+    // }
 #    ifdef POINTING_DEVICE_ENABLE
 #        ifndef NO_CHARYBDIS_KEYCODES
     switch (keycode) {
@@ -304,9 +304,9 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     }
 #        endif // !NO_CHARYBDIS_KEYCODES
 #    endif     // POINTING_DEVICE_ENABLE
-    if (IS_QK_KB(keycode) || IS_MOUSEKEY(keycode)) {
-        debug_charybdis_config_to_console(&g_charybdis_config);
-    }
+    // if (IS_QK_KB(keycode) || IS_MOUSEKEY(keycode)) {
+    //     debug_charybdis_config_to_console(&g_charybdis_config);
+    // }
     return true;
 }
 
