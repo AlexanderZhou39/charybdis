@@ -42,10 +42,16 @@
 #        define CHARYBDIS_SNIPING_DPI_CONFIG_STEP 100
 #    endif // CHARYBDIS_SNIPING_DPI_CONFIG_STEP
 
-// Fixed DPI for drag-scroll.
+// Drag-scroll DPI (baseline) and derived slow/fast scroll DPIs (non-adjustable).
 #    ifndef CHARYBDIS_DRAGSCROLL_DPI
-#        define CHARYBDIS_DRAGSCROLL_DPI 100
+#        define CHARYBDIS_DRAGSCROLL_DPI 80
 #    endif // CHARYBDIS_DRAGSCROLL_DPI
+#    ifndef CHARYBDIS_SLOWSCROLL_DPI
+#        define CHARYBDIS_SLOWSCROLL_DPI 40
+#    endif // CHARYBDIS_SLOWSCROLL_DPI
+#    ifndef CHARYBDIS_FASTSCROLL_DPI
+#        define CHARYBDIS_FASTSCROLL_DPI 120
+#    endif // CHARYBDIS_FASTSCROLL_DPI
 
 #    ifndef CHARYBDIS_DRAGSCROLL_BUFFER_SIZE
 #        define CHARYBDIS_DRAGSCROLL_BUFFER_SIZE 6
@@ -58,6 +64,7 @@ typedef union {
         uint8_t pointer_sniping_dpi : 2; // 4 steps available.
         bool    is_dragscroll_enabled : 1;
         bool    is_sniping_enabled : 1;
+        bool    is_fastscroll_enabled : 1; // not persisted in raw
     } __attribute__((packed));
 } charybdis_config_t;
 
@@ -75,6 +82,7 @@ static void read_charybdis_config_from_eeprom(charybdis_config_t* config) {
     config->raw                   = eeconfig_read_kb() & 0xff;
     config->is_dragscroll_enabled = false;
     config->is_sniping_enabled    = false;
+    config->is_fastscroll_enabled = false;
 }
 
 /**
@@ -102,11 +110,19 @@ static uint16_t get_pointer_sniping_dpi(charybdis_config_t* config) {
 /** \brief Set the appropriate DPI for the input config. */
 static void maybe_update_pointing_device_cpi(charybdis_config_t* config) {
     if (config->is_dragscroll_enabled) {
-        pointing_device_set_cpi(CHARYBDIS_DRAGSCROLL_DPI);
-    } else if (config->is_sniping_enabled) {
-        pointing_device_set_cpi(get_pointer_sniping_dpi(config));
+        if (config->is_fastscroll_enabled) {
+            pointing_device_set_cpi(CHARYBDIS_FASTSCROLL_DPI);
+        } else if (config->is_sniping_enabled) {
+            pointing_device_set_cpi(CHARYBDIS_SLOWSCROLL_DPI);
+        } else {
+            pointing_device_set_cpi(CHARYBDIS_DRAGSCROLL_DPI);
+        }
     } else {
-        pointing_device_set_cpi(get_pointer_default_dpi(config));
+        if (config->is_sniping_enabled) {
+            pointing_device_set_cpi(get_pointer_sniping_dpi(config));
+        } else {
+            pointing_device_set_cpi(get_pointer_default_dpi(config));
+        }
     }
 }
 
@@ -164,6 +180,9 @@ bool charybdis_get_pointer_sniping_enabled(void) {
 
 void charybdis_set_pointer_sniping_enabled(bool enable) {
     g_charybdis_config.is_sniping_enabled = enable;
+    if (enable) {
+        g_charybdis_config.is_fastscroll_enabled = false;
+    }
     maybe_update_pointing_device_cpi(&g_charybdis_config);
 }
 
@@ -176,10 +195,22 @@ void charybdis_set_pointer_dragscroll_enabled(bool enable) {
     maybe_update_pointing_device_cpi(&g_charybdis_config);
 }
 
+bool charybdis_get_pointer_fastscroll_enabled(void) {
+    return g_charybdis_config.is_fastscroll_enabled;
+}
+
+void charybdis_set_pointer_fastscroll_enabled(bool enable) {
+    g_charybdis_config.is_fastscroll_enabled = enable;
+    if (enable) {
+        g_charybdis_config.is_sniping_enabled = false;
+    }
+    maybe_update_pointing_device_cpi(&g_charybdis_config);
+}
+
 /**
  * \brief Augment the pointing device behavior.
  *
- * Implement drag-scroll.
+ * Implement scroll conversion for sniping and fast scroll modes.
  */
 static void pointing_device_task_charybdis(report_mouse_t* mouse_report) {
     static int16_t scroll_buffer_x = 0;
@@ -238,20 +269,21 @@ static bool has_shift_mod(void) {
  *   - default DPI: internal table index/actual DPI
  *   - sniping DPI: internal table index/actual DPI
  */
-static void debug_charybdis_config_to_console(charybdis_config_t* config) {
-#    ifdef CONSOLE_ENABLE
-    dprintf("(charybdis) process_record_kb: config = {\n"
-            "\traw = 0x%X,\n"
-            "\t{\n"
-            "\t\tis_dragscroll_enabled=%u\n"
-            "\t\tis_sniping_enabled=%u\n"
-            "\t\tdefault_dpi=0x%X (%u)\n"
-            "\t\tsniping_dpi=0x%X (%u)\n"
-            "\t}\n"
-            "}\n",
-            config->raw, config->is_dragscroll_enabled, config->is_sniping_enabled, config->pointer_default_dpi, get_pointer_default_dpi(config), config->pointer_sniping_dpi, get_pointer_sniping_dpi(config));
-#    endif // CONSOLE_ENABLE
-}
+// static void debug_charybdis_config_to_console(charybdis_config_t* config) {
+// #    ifdef CONSOLE_ENABLE
+//     dprintf("(charybdis) process_record_kb: config = {\n"
+//             "\traw = 0x%X,\n"
+//             "\t{\n"
+//             "\t\tis_dragscroll_enabled=%u\n"
+//             "\t\tis_sniping_enabled=%u\n"
+//             "\t\tis_fastscroll_enabled=%u\n"
+//             "\t\tdefault_dpi=0x%X (%u)\n"
+//             "\t\tsniping_dpi=0x%X (%u)\n"
+//             "\t}\n"
+//             "}\n",
+//             config->raw, config->is_dragscroll_enabled, config->is_sniping_enabled, config->is_fastscroll_enabled, config->pointer_default_dpi, get_pointer_default_dpi(config), config->pointer_sniping_dpi, get_pointer_sniping_dpi(config));
+// #    endif // CONSOLE_ENABLE
+// }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     // if (!process_record_user(keycode, record)) {
@@ -299,6 +331,14 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
         case DRAGSCROLL_MODE_TOGGLE:
             if (record->event.pressed) {
                 charybdis_set_pointer_dragscroll_enabled(!charybdis_get_pointer_dragscroll_enabled());
+            }
+            break;
+        case FASTSCROLL_MODE:
+            charybdis_set_pointer_fastscroll_enabled(record->event.pressed);
+            break;
+        case FASTSCROLL_MODE_TOGGLE:
+            if (record->event.pressed) {
+                charybdis_set_pointer_fastscroll_enabled(!charybdis_get_pointer_fastscroll_enabled());
             }
             break;
     }

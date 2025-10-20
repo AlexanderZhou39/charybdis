@@ -23,7 +23,7 @@
 #ifdef POINTING_DEVICE_ENABLE
 #    ifndef NO_CHARYBDIS_KEYCODES
 enum charybdis_keycodes {
-    POINTER_DEFAULT_DPI_FORWARD = QK_KB_0,
+    POINTER_DEFAULT_DPI_FORWARD = SAFE_RANGE,
     POINTER_DEFAULT_DPI_REVERSE,
     POINTER_SNIPING_DPI_FORWARD,
     POINTER_SNIPING_DPI_REVERSE,
@@ -31,6 +31,8 @@ enum charybdis_keycodes {
     SNIPING_MODE_TOGGLE,
     DRAGSCROLL_MODE,
     DRAGSCROLL_MODE_TOGGLE,
+    FASTSCROLL_MODE,
+    FASTSCROLL_MODE_TOGGLE,
 };
 
 #        define DPI_MOD POINTER_DEFAULT_DPI_FORWARD
@@ -41,6 +43,8 @@ enum charybdis_keycodes {
 #        define SNP_TOG SNIPING_MODE_TOGGLE
 #        define DRGSCRL DRAGSCROLL_MODE
 #        define DRG_TOG DRAGSCROLL_MODE_TOGGLE
+#        define FASTSCRL FASTSCROLL_MODE
+#        define FST_TOG FASTSCROLL_MODE_TOGGLE
 #    endif // !NO_CHARYBDIS_KEYCODES
 
 /** \brief Return the current DPI value for the pointer's default mode. */
@@ -108,4 +112,10 @@ bool charybdis_get_pointer_dragscroll_enabled(void);
  * are translated into horizontal and vertical scroll movements.
  */
 void charybdis_set_pointer_dragscroll_enabled(bool enable);
+
+/** \brief Whether fast-scroll is enabled. */
+bool charybdis_get_pointer_fastscroll_enabled(void);
+
+/** \brief Enable/disable fast-scroll mode. */
+void charybdis_set_pointer_fastscroll_enabled(bool enable);
 #endif // POINTING_DEVICE_ENABLE
