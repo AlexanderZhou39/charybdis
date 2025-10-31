@@ -50,7 +50,7 @@
 #        define CHARYBDIS_SLOWSCROLL_DPI 100
 #    endif // CHARYBDIS_SLOWSCROLL_DPI
 #    ifndef CHARYBDIS_FASTSCROLL_DPI
-#        define CHARYBDIS_FASTSCROLL_DPI 600
+#        define CHARYBDIS_FASTSCROLL_DPI 300
 #    endif // CHARYBDIS_FASTSCROLL_DPI
 
 #    ifndef CHARYBDIS_DRAGSCROLL_BUFFER_SIZE
@@ -110,13 +110,13 @@ static uint16_t get_pointer_sniping_dpi(charybdis_config_t* config) {
 /** \brief Set the appropriate DPI for the input config. */
 static void maybe_update_pointing_device_cpi(charybdis_config_t* config) {
     if (config->is_dragscroll_enabled) {
-        // if (config->is_fastscroll_enabled) {
-        //     pointing_device_set_cpi(CHARYBDIS_FASTSCROLL_DPI);
-        // } else if (config->is_sniping_enabled) {
-        //     pointing_device_set_cpi(CHARYBDIS_SLOWSCROLL_DPI);
-        // } else {
+        if (config->is_fastscroll_enabled) {
+            pointing_device_set_cpi(CHARYBDIS_FASTSCROLL_DPI);
+        } else if (config->is_sniping_enabled) {
+            pointing_device_set_cpi(CHARYBDIS_SLOWSCROLL_DPI);
+        } else {
             pointing_device_set_cpi(CHARYBDIS_DRAGSCROLL_DPI);
-        // }
+        }
     } else {
         if (config->is_sniping_enabled) {
             pointing_device_set_cpi(get_pointer_sniping_dpi(config));
@@ -227,20 +227,20 @@ static void pointing_device_task_charybdis(report_mouse_t* mouse_report) {
         scroll_buffer_y += mouse_report->y;
 #    endif // CHARYBDIS_DRAGSCROLL_REVERSE_Y
 
-        int16_t buffer_size = CHARYBDIS_DRAGSCROLL_BUFFER_SIZE;
-        if (g_charybdis_config.is_fastscroll_enabled) {
-            buffer_size /= 2;
-        } else if (g_charybdis_config.is_sniping_enabled) {
-            buffer_size *= 2;
-        }
+        // int16_t buffer_size = CHARYBDIS_DRAGSCROLL_BUFFER_SIZE;
+        // if (g_charybdis_config.is_fastscroll_enabled) {
+        //     buffer_size = 3;
+        // } else if (g_charybdis_config.is_sniping_enabled) {
+        //     buffer_size = 16;
+        // }
 
         mouse_report->x = 0;
         mouse_report->y = 0;
-        if (abs(scroll_buffer_x) > buffer_size) {
+        if (abs(scroll_buffer_x) > CHARYBDIS_DRAGSCROLL_BUFFER_SIZE) {
             mouse_report->h = scroll_buffer_x > 0 ? 1 : -1;
             scroll_buffer_x = 0;
         }
-        if (abs(scroll_buffer_y) > buffer_size) {
+        if (abs(scroll_buffer_y) > CHARYBDIS_DRAGSCROLL_BUFFER_SIZE) {
             mouse_report->v = scroll_buffer_y > 0 ? 1 : -1;
             scroll_buffer_y = 0;
         }
