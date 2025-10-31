@@ -51,13 +51,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [LAYER_LOWER] = LAYOUT(
   // ╭──────────────────────────────────────────────────────╮ ╭──────────────────────────────────────────────────────╮
-       KC_TILD, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,    KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_UNDS,
+       KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,    KC_CIRC,   KC_AMPR, KC_ASTR,    KC_LPRN, KC_RPRN, KC_UNDS,
   // ├──────────────────────────────────────────────────────┤ ├──────────────────────────────────────────────────────┤
-       _______, KC_LCBR, KC_RCBR, KC_LBRC, KC_RBRC, _______,    _______,   KC_UNDS, KC_LABK,    KC_RABK, KC_DLR, _______,
+       _______, KC_LCBR, KC_RCBR, KC_LBRC, KC_RBRC, _______,    _______,   KC_UNDS, KC_LABK,    KC_RABK, KC_DLR,  _______,
   // ├──────────────────────────────────────────────────────┤ ├──────────────────────────────────────────────────────┤
-       _______, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, KC_COLN,    KC_BSLS,   KC_1,    KC_LPRN,    KC_RPRN, KC_EQL, _______,
+       _______, KC_SCLN, KC_SLSH, KC_MINS, KC_0,    KC_COLN,    KC_BSLS,   KC_1,    KC_LPRN,    KC_RPRN, KC_EQL,  _______,
   // ├──────────────────────────────────────────────────────┤ ├──────────────────────────────────────────────────────┤
-       _______, KC_6,    KC_7,    KC_8,    KC_9,    KC_PLUS,    KC_ASTR,   KC_2,    KC_3,       KC_4,     KC_5,  _______,
+       _______, KC_6,    KC_7,    KC_8,    KC_9,    KC_PLUS,    KC_ASTR,   KC_2,    KC_3,       KC_4,     KC_5,   _______,
   // ╰──────────────────────────────────────────────────────┤ ├──────────────────────────────────────────────────────╯
                                   _______, _______, XXXXXXX,    XXXXXXX, _______,
                                            _______, _______,    _______
