@@ -27,11 +27,11 @@
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifndef CHARYBDIS_MINIMUM_DEFAULT_DPI
-#        define CHARYBDIS_MINIMUM_DEFAULT_DPI 650
+#        define CHARYBDIS_MINIMUM_DEFAULT_DPI 500
 #    endif // CHARYBDIS_MINIMUM_DEFAULT_DPI
 
 #    ifndef CHARYBDIS_DEFAULT_DPI_CONFIG_STEP
-#        define CHARYBDIS_DEFAULT_DPI_CONFIG_STEP 200
+#        define CHARYBDIS_DEFAULT_DPI_CONFIG_STEP 100
 #    endif // CHARYBDIS_DEFAULT_DPI_CONFIG_STEP
 
 #    ifndef CHARYBDIS_MINIMUM_SNIPING_DPI
@@ -44,13 +44,13 @@
 
 // Drag-scroll DPI (baseline) and derived slow/fast scroll DPIs (non-adjustable).
 #    ifndef CHARYBDIS_DRAGSCROLL_DPI
-#        define CHARYBDIS_DRAGSCROLL_DPI 80
+#        define CHARYBDIS_DRAGSCROLL_DPI 800
 #    endif // CHARYBDIS_DRAGSCROLL_DPI
 #    ifndef CHARYBDIS_SLOWSCROLL_DPI
-#        define CHARYBDIS_SLOWSCROLL_DPI 40
+#        define CHARYBDIS_SLOWSCROLL_DPI 400
 #    endif // CHARYBDIS_SLOWSCROLL_DPI
 #    ifndef CHARYBDIS_FASTSCROLL_DPI
-#        define CHARYBDIS_FASTSCROLL_DPI 120
+#        define CHARYBDIS_FASTSCROLL_DPI 2000
 #    endif // CHARYBDIS_FASTSCROLL_DPI
 
 #    ifndef CHARYBDIS_DRAGSCROLL_BUFFER_SIZE
@@ -226,6 +226,11 @@ static void pointing_device_task_charybdis(report_mouse_t* mouse_report) {
 #    else
         scroll_buffer_y += mouse_report->y;
 #    endif // CHARYBDIS_DRAGSCROLL_REVERSE_Y
+        
+        // scale scrolling by 10x
+        scroll_buffer_x /= 10;
+        scroll_buffer_y /= 10;
+
         mouse_report->x = 0;
         mouse_report->y = 0;
         if (abs(scroll_buffer_x) > CHARYBDIS_DRAGSCROLL_BUFFER_SIZE) {
